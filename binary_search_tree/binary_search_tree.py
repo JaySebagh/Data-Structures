@@ -9,6 +9,7 @@ class BinarySearchTree:
         self.value = value
         self.left = None
         self.right = None
+        self.stack = Stack()
 
     # Insert the given value into the tree
     def insert(self, value):
@@ -89,7 +90,17 @@ class BinarySearchTree:
     # Print the value of every node, starting with the given node,
     # in an iterative depth first traversal
     def dft_print(self, node):
-        pass
+        self.stack.push(node)
+        while self.stack.len() > 0:
+            popped = self.stack.pop()
+            print(popped.value)
+            if popped.left:
+                self.stack.push(popped.left)
+
+            if popped.right:
+                self.stack.push(popped.right)
+        return
+
 
     # STRETCH Goals -------------------------
     # Note: Research may be required
