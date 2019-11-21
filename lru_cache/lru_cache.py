@@ -1,3 +1,7 @@
+import sys
+sys.path.append('./doubly_linked_list')
+from doubly_linked_list import DoublyLinkedList
+
 class LRUCache:
     """
     Our LRUCache class keeps track of the max number of nodes it
@@ -7,7 +11,10 @@ class LRUCache:
     to every node stored in the cache.
     """
     def __init__(self, limit=10):
-        pass
+        self.storage = DoublyLinkedList()
+        self.capacity = 0
+        self.limit = limit
+        self.kv_dict = {}
 
     """
     Retrieves the value associated with the given key. Also
@@ -17,8 +24,13 @@ class LRUCache:
     key-value pair doesn't exist in the cache.
     """
     def get(self, key):
-        pass
-
+        if key in self.kv_dict:
+            grab = self.kv_dict[key]
+            self.storage.move_to_end(grab)
+            return grab.value[1]
+        else:
+            return None
+        
     """
     Adds the given key-value pair to the cache. The newly-
     added pair should be considered the most-recently used
@@ -30,4 +42,32 @@ class LRUCache:
     the newly-specified value.
     """
     def set(self, key, value):
-        pass
+        # if key exists, update it's value and make it the tail
+        if key in self.kv_dict:
+            grab = self.kv_dict[key]
+            self.storage.move_to_end(grab)
+            self.storage.remove_from_tail()
+            self.storage.add_to_tail((key, value))
+            self.kv_dict[key] = self.storage.tail
+        # check if capacity is less than 10
+        elif self.capacity < self.limit:
+            # if the storage is empty, add the key value as the head
+            if self.storage.length < 1:
+                self.storage.add_to_head((key, value))
+                self.kv_dict[key] = self.storage.head
+                self.capacity += 1
+                # print(self.kv_dict[key].value)
+            # if the capacity is 1, add the key value as the tail
+            elif self.storage.length >= 1:
+                self.storage.add_to_tail((key, value))
+                self.kv_dict[key] = self.storage.tail
+                self.capacity += 1
+            # if the capacity is greater than 2 and less than 10, add key value as the tail
+        # if the capacity is greater than 10, remove the head and add the key value as the tail
+        # if I remove the head, does the 2nd node automatically become the new head? Or do I have to reassign?
+        else:
+            fill_key = self.storage.remove_from_head()
+            # print("fill key: ", fill_key)
+            self.kv_dict.pop(fill_key[0])
+            self.storage.add_to_tail((key, value))
+            self.kv_dict[key] = self.storage.tail
